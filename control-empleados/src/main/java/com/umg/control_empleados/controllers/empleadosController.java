@@ -41,6 +41,7 @@ public class empleadosController {
         return empleadosRepository.findAll();
     }
 
+    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
     @GetMapping("/empleados/{id}")
     public ResponseEntity<empleados> getEmpleadosById(@PathVariable(value = "id") Long id) {
         Optional<empleados> empleados = empleadosRepository.findById(id);
@@ -51,11 +52,7 @@ public class empleadosController {
         }
     }
 
-    @PostMapping("/empleados")
-    public empleados createEmpleados(@RequestBody empleados empleados) {
-        return empleadosRepository.save(empleados);
-    }
-
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/empleados/{id}")
     public ResponseEntity<empleados> updateEmpleado(@PathVariable(value = "id") Long id,
             @RequestBody empleados empleadoDetalles) {
@@ -72,6 +69,7 @@ public class empleadosController {
         }
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/empleados/estado/{id}/{estado}")
     public ResponseEntity<empleados> updateEmpleadoEstado(
             @PathVariable(value = "id") Long id,

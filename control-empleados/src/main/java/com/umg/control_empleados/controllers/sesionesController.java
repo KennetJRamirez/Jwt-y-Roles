@@ -6,6 +6,7 @@ import com.umg.control_empleados.repository.empleadosRepository;
 import com.umg.control_empleados.repository.sesionesRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -22,6 +23,7 @@ public class sesionesController {
 
 
     //registrar marcaje
+    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
     @PostMapping("/sesion/inicio/{id}")
     public ResponseEntity<Long> sesionInicio(@PathVariable(value = "id") Long empleadoID) {
         Optional<empleados> empleados = empleadosRepository.findById(empleadoID);
@@ -36,6 +38,7 @@ public class sesionesController {
         }
     }
 
+    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
     @PutMapping("/sesion/fin/{id}")
     public ResponseEntity<sesiones> sesionFin(@PathVariable(value = "id") Long sesionID){
         Optional<sesiones> OptionalSesiones = sesionesRepository.findById(sesionID);

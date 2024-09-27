@@ -8,6 +8,7 @@ import com.umg.control_empleados.repository.registrosRepository;
 import com.umg.control_empleados.repository.empleadosRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -23,6 +24,7 @@ public class registrosController {
     private empleadosRepository empleadosRepository;
 
     //registrar marcaje
+    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
     @PostMapping("/registros/{id}/marcaje/{tipo}")
     public ResponseEntity<Long> registrarMarcaje(@PathVariable(value = "id") Long empleadoID, @PathVariable(value="tipo") registros_marcaje.TipoMarcaje tipo) {
         Optional<empleados> empleados = empleadosRepository.findById(empleadoID);
