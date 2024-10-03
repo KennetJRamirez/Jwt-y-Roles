@@ -18,6 +18,7 @@ import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.umg.control_empleados.jwt.JwtUtils;
 import com.umg.control_empleados.models.empleados;
+import com.umg.control_empleados.repository.empleadosRepository;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -27,9 +28,11 @@ import jakarta.servlet.http.HttpServletResponse;
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
     private JwtUtils jwtUtils;
+    private empleadosRepository empleadosRepo;
 
-    public JwtAuthenticationFilter(JwtUtils jwtUtils) {
+    public JwtAuthenticationFilter(JwtUtils jwtUtils, empleadosRepository empleadosRepo) {
         this.jwtUtils = jwtUtils;
+        this.empleadosRepo = empleadosRepo;
     }
 
     @Override
@@ -45,6 +48,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             // Aca puedo mapear el correo tambien, testeare el username xd
             username = empleado.getUsername();
             password = empleado.getContrasena();
+
         } catch (StreamReadException e) {
             throw new RuntimeException(e);
         } catch (DatabindException e) {
@@ -65,12 +69,17 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         // Detalles del usuario
 
         User user = (User) authResult.getPrincipal();
+
+        empleados empleado = empleadosRepo.findByUsername(user.getUsername())
+                .orElseThrow(() -> new RuntimeException("Empleado no encontrado"));
+
         String token = jwtUtils.generateAccessToken(user.getUsername());
 
         response.addHeader("Autorizado by: ", token);
 
         Map<String, Object> httpResponse = new HashMap<>();
         httpResponse.put("token", token);
+        httpResponse.put("empleadoId", empleado.getId());
         httpResponse.put("username", user.getUsername());
         httpResponse.put("Message", "Autenticacion Correcta");
 
